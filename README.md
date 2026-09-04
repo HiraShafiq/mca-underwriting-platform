@@ -1,4 +1,4 @@
-# MCA Underwriting Intelligence, GitHub + Railway Edition
+# MCA Underwriting Intelligence
 
 This project is a secured full-stack version underwriting agent.
 
