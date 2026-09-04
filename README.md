@@ -1,155 +1,206 @@
-# MCA Underwriting Intelligence
+MCA Underwriting Intelligence
 
-This project is a secured full-stack version underwriting agent.
+An AI-powered underwriting platform built for Merchant Cash Advance (MCA) file review and decision support.
 
+The platform analyzes business bank statements, identifies existing financing positions, evaluates cash-flow risk, detects NSFs and negative balance activity, and generates structured funding recommendations for underwriter review.
 
-## Important privacy note
+Live Demo
 
-This application handles financial information. Do not treat this starter project as a substitute for a formal security, privacy, or compliance review before processing real customer data at scale. For demos, use redacted or synthetic statements whenever possible.
+https://mca-underwriting-platform.vercel.app/
 
-## 1. Local setup
+For demonstration purposes, use synthetic or redacted bank statements only.
 
-Install Node.js 20 or newer, then:
+Key Features
 
-```bash
+Multi-month bank statement analysis
+
+Average monthly revenue calculation
+
+NSF and negative balance detection
+
+Existing MCA position identification
+
+Estimated outstanding balance and payment analysis
+
+Risk flag and positive-factor detection
+
+Automated risk rating
+
+Position-based underwriting logic
+
+Funding amount recommendations
+
+Daily and weekly payment calculations
+
+Approval and decline workflow
+
+AI-generated closing scripts
+
+Underwriting dashboard with historical decisions
+
+Client-side PDF text extraction
+
+Secure server-side Anthropic API integration
+
+How It Works
+
+Bank Statements
+      ↓
+PDF Text Extraction
+      ↓
+Secure Backend API
+      ↓
+AI Underwriting Analysis
+      ↓
+Risk Assessment
+      ↓
+Funding Recommendation
+      ↓
+Underwriter Review
+
+The frontend never receives the Anthropic API key. AI requests are routed through the backend using server-side environment variables.
+
+Technology Stack
+
+React
+
+Vite
+
+Node.js
+
+Express
+
+Anthropic Claude API
+
+PDF.js
+
+Vercel
+
+JavaScript
+
+Browser localStorage
+
+Security Architecture
+
+The Anthropic API key is stored only as a server-side environment variable:
+
+process.env.ANTHROPIC_API_KEY
+
+It is never embedded in frontend JavaScript.
+
+The application also includes:
+
+API rate limiting
+
+Request validation
+
+Security headers
+
+Server-side underwriting logic
+
+Optional application authentication
+
+Environment-based secret management
+
+Data Handling
+
+In the current demo architecture:
+
+PDFs are opened locally in the user's browser.
+
+PDF.js extracts statement text client-side.
+
+Extracted text is sent to the secure /api/analyze endpoint.
+
+The backend communicates with Anthropic.
+
+Uploaded PDFs are not intentionally stored by the application.
+
+Dashboard records are stored locally in the user's browser using localStorage.
+
+No production database is currently used.
+
+Underwriting Workflow
+
+The AI analysis produces structured underwriting information including:
+
+Business name
+
+Bank name
+
+Industry
+
+Monthly deposits
+
+Average monthly revenue
+
+Existing financing positions
+
+Estimated outstanding balances
+
+Daily or weekly payments
+
+NSF count
+
+Negative balance days
+
+Largest negative balance
+
+Risk factors
+
+Positive factors
+
+Overall risk rating
+
+The platform then applies underwriting rules to generate a recommended funding amount and payment structure.
+
+All AI-generated recommendations are intended to support human underwriting review, not replace final underwriting judgment.
+
+Local Development
+
+Requires Node.js 20 or newer.
+
+Install dependencies:
+
 npm install
+
+Create a local environment file:
+
 cp .env.example .env
-```
 
-Edit `.env` and add your Anthropic API key.
+Add your Anthropic credentials to .env:
 
-For local development:
+ANTHROPIC_API_KEY=your-key
+ANTHROPIC_MODEL=claude-sonnet-4-6
 
-```bash
+Start the development environment:
+
 npm run dev
-```
-
-Open:
-
-```text
-http://localhost:5173
-```
-
-The backend runs on port 3000 and Vite proxies `/api` requests to it.
-
-## 2. Test a production build locally
-
-```bash
-npm run build
-NODE_ENV=production npm start
-```
 
 Then open:
 
-```text
-http://localhost:3000
-```
+http://localhost:5173
 
-## 3. Push to GitHub
+Environment Variables
 
-Create a private GitHub repository first. From this project folder:
+Required:
 
-```bash
-git init
-git add .
-git commit -m "Initial secure underwriting platform"
-git branch -M main
-git remote add origin YOUR_GITHUB_REPOSITORY_URL
-git push -u origin main
-```
+ANTHROPIC_API_KEY
+ANTHROPIC_MODEL
 
-Do not commit `.env`. It is already blocked by `.gitignore`.
+Optional:
 
-Before your first push, you can verify:
+APP_USERNAME
+APP_PASSWORD
+ALLOWED_HOSTS
+VITE_EMAILJS_SERVICE_ID
+VITE_EMAILJS_TEMPLATE_ID
+VITE_EMAILJS_PUBLIC_KEY
 
-```bash
-git status
-```
+Never commit .env files or API credentials to GitHub.
 
-You should not see `.env` staged.
+Project Structure
 
-## 4. Deploy to Railway
-
-1. Create a Railway project.
-2. Choose **Deploy from GitHub repo**.
-3. Select this repository.
-4. Railway should detect Node automatically.
-5. In the service's **Variables** tab, add:
-
-```text
-NODE_ENV=production
-ANTHROPIC_API_KEY=your-real-key
-ANTHROPIC_MODEL=claude-sonnet-4-6
-APP_USERNAME=your-demo-username
-APP_PASSWORD=a-long-random-password
-```
-
-6. After adding the Anthropic key and password, use Railway's **Seal** option for those sensitive variables.
-7. Deploy the staged changes.
-8. Open **Settings > Networking > Generate Domain**.
-9. Open the generated Railway URL.
-
-If `APP_USERNAME` and `APP_PASSWORD` are configured, your browser will prompt you for credentials before the app loads.
-
-## 5. Optional host lock
-
-Once Railway gives you a domain, you can optionally add:
-
-```text
-ALLOWED_HOSTS=your-project.up.railway.app
-```
-
-Do not include `https://`, only the hostname.
-
-## 6. Optional EmailJS
-
-The existing broker-email feature is kept optional. If you use EmailJS, set these as Railway variables before the build:
-
-```text
-VITE_EMAILJS_SERVICE_ID=...
-VITE_EMAILJS_TEMPLATE_ID=...
-VITE_EMAILJS_PUBLIC_KEY=...
-```
-
-These are intentionally browser-visible identifiers because variables beginning with `VITE_` are bundled into frontend JavaScript. Never put an Anthropic key, database password, or other private secret in a `VITE_` variable.
-
-If you leave these blank, underwriting and closing-script generation still work, but the broker email action will show a configuration error.
-
-## 7. Anthropic key safety
-
-The only server-side reference is:
-
-```js
-process.env.ANTHROPIC_API_KEY
-```
-
-Never replace that code with a literal key.
-
-If a real API key was ever committed to GitHub, deleting it from the file is not enough. Revoke that key at the provider and create a new one.
-
-## 8. Data behavior in this version
-
-- PDFs are opened in the user's browser with PDF.js.
-- Extracted statement text is sent to your `/api/analyze` endpoint.
-- The backend forwards the relevant statement text to Anthropic.
-- The browser's dashboard history remains in `localStorage` on that device.
-- No database is included.
-- Uploaded PDFs are not intentionally stored by this server.
-
-## 9. Recommended next upgrades before real multi-user use
-
-1. Replace Basic Auth with per-user authentication.
-2. Add a database with tenant isolation if records need to sync across devices.
-3. Add server-side audit logs that do not contain raw bank data.
-4. Add a retention/deletion policy.
-5. Add malware/file scanning if you later upload PDFs to the server.
-6. Add stricter AI output validation, preferably with a schema validator.
-7. Have underwriting rules reviewed by your business/compliance team before using automated recommendations as production decisions.
-8. Review the third-party data-processing terms applicable to bank-statement data before production use.
-
-## Project structure
-
-```text
 mca-underwriting-platform/
 ├── src/
 │   ├── App.jsx
@@ -159,6 +210,30 @@ mca-underwriting-platform/
 ├── index.html
 ├── package.json
 ├── README.md
+├── SECURITY.md
 ├── server.js
 └── vite.config.js
-```
+
+Current Status
+
+This project is a working prototype designed to demonstrate AI-assisted commercial underwriting workflows.
+
+Future development may include:
+
+User authentication
+
+Multi-tenant lender accounts
+
+PostgreSQL persistence
+
+Custom lender underwriting policies
+
+Audit logging
+
+Role-based access control
+
+Expanded SBA, equipment financing, term loan, and commercial lending support
+
+Disclaimer
+
+This project is a demonstration of AI-assisted underwriting technology. It should not be used as a substitute for formal underwriting policies, compliance review, legal review, or human decision-making when processing real financial applications.
